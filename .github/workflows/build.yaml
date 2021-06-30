@@ -40,10 +40,10 @@ jobs:
       run: echo "${{ steps.conan.outputs.version }}"
 
     - name: Build
-      run: conan create . demo/testing
+      run: conan create . ${{ github.actor }}/${{ steps.gitversion.outputs.escapedBranchName }}
     - name: Upload
       run: |
         conan remote add ${{ env.CONAN_REPO }} ${{ env.CONAN_REPO_URL }}
         conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r ${{ env.CONAN_REPO }} ${{ secrets.MY_JFROG_IO_USERNAME }}
-        conan upload ${{ env.PACKAGE_NAME }}/${{ env.GITVERSION_SEMVER }}@demo/testing -r ${{ env.CONAN_REPO }} --all
+        conan upload ${{ env.PACKAGE_NAME }}/${{ env.GITVERSION_SEMVER }}@${{ github.actor }}/${{ steps.gitversion.outputs.escapedBranchName }} -r ${{ env.CONAN_REPO }} --all
       
