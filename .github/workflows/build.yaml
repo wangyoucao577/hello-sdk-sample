@@ -2,6 +2,10 @@ name: Build
 
 on: push
 
+env:
+  CONAN_REPO: my-conan-repo
+  CONAN_REPO_URL: https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
+
 jobs:
 
   build:
@@ -18,7 +22,7 @@ jobs:
       run: conan create . demo/testing
     - name: Upload
       run: |
-        conan remote add my-conan-repo https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
-        conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r my-conan-repo ${{ secrets.MY_JFROG_IO_USERNAME }}
-        conan upload hello/0.1@demo/testing -r my-conan-repo --all
+        conan remote add ${{ env.CONAN_REPO }} ${{ env.CONAN_REPO_URL }}
+        conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r ${{ env.CONAN_REPO }} ${{ secrets.MY_JFROG_IO_USERNAME }}
+        conan upload hello/0.1@demo/testing -r ${{ env.CONAN_REPO }} --all
       
