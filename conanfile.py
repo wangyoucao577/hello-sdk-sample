@@ -1,9 +1,8 @@
 from conans import ConanFile, CMake
-
+import os
 
 class HelloConan(ConanFile):
     name = "hello"
-    version = "0.1"
     license = "MIT"
     author = "<Put your name here> <And your email here>"
     url = "<Package recipe repository url here, for issues about the package>"
@@ -14,6 +13,9 @@ class HelloConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
     generators = "cmake"
     exports_sources = "src/*"
+
+    def set_version(self):
+        self.version = os.getenv('GITVERSION_SEMVER', '0.1')
 
     def config_options(self):
         if self.settings.os == "Windows":
