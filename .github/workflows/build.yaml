@@ -30,6 +30,8 @@ jobs:
     - name: Display SemVer
       run: |
         echo "SemVer: $GITVERSION_SEMVER"
+    - name: Set PACKAGE_SEMVER env
+      run: echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }}+${{ steps.gitversion.outputs.escapedBranchName }}.${{ steps.gitversion.outputs.shortSha }} >> ${GITHUB_ENV}
 
 
     # use conan to build and store
@@ -45,5 +47,5 @@ jobs:
       run: |
         conan remote add ${{ env.CONAN_REPO }} ${{ env.CONAN_REPO_URL }}
         conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r ${{ env.CONAN_REPO }} ${{ secrets.MY_JFROG_IO_USERNAME }}
-        conan upload ${{ env.PACKAGE_NAME }}/${{ env.GITVERSION_SEMVER }}@${{ github.actor }}/${{ steps.gitversion.outputs.escapedBranchName }} -r ${{ env.CONAN_REPO }} --all
+        conan upload ${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }}@${{ github.actor }}/${{ steps.gitversion.outputs.escapedBranchName }} -r ${{ env.CONAN_REPO }} --all
       

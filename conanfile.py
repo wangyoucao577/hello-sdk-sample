@@ -15,11 +15,7 @@ class HelloConan(ConanFile):
     exports_sources = "src/*"
 
     def set_version(self):
-        metadata = '{}.{}'.format(os.getenv('GITVERSION_ESCAPEDBRANCHNAME'), os.getenv('GITVERSION_SHORTSHA'))
-        
-        self.version = os.getenv('GITVERSION_FULLSEMVER', '0.1')
-        if metadata != '.':
-            self.version += '+' + metadata
+        self.version = os.getenv('PACKAGE_SEMVER', '0.1')
 
     def config_options(self):
         if self.settings.os == "Windows":
