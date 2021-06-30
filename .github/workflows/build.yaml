@@ -16,4 +16,11 @@ jobs:
       run: echo "${{ steps.conan.outputs.version }}"
     - name: Build
       run: conan create . demo/testing
+    - name: Upload
+      uses: grisumbras/conan-upload@latest
+      with:
+        login: ${{ secrets.MY_JFROG_IO_USERNAME }}
+        password: ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }}
+        url: https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
+        reference: hello/0.1@demo/testing
       
