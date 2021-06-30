@@ -1,4 +1,5 @@
 mode: ContinuousDelivery
+assembly-versioning-format: '{Major}.{Minor}.{Patch}+{BuildMetaData}.{EscapedBranchName}.{ShortSha}'
 branches: {}
 ignore:
   sha: []
