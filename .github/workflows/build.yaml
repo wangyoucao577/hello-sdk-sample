@@ -45,14 +45,17 @@ jobs:
       run: | 
         echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }}+${{ steps.gitversion.outputs.escapedBranchName }}.${{ steps.gitversion.outputs.shortSha }} >> ${GITHUB_ENV}
         echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/${{ steps.gitversion.outputs.escapedBranchName }} >> ${GITHUB_ENV}
-        echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }}@${{ env.CONAN_PACKAGE_USER_CHANNEL }} >> ${GITHUB_ENV}
     - name: Set envs for tags
       if: ${{ github.event_name == 'push' && contains(github.ref, 'tags') }} 
       run: | 
         echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }} >> ${GITHUB_ENV}
         echo CONAN_PACKAGE_USER_CHANNEL= >> ${GITHUB_ENV}
-        echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }} >> ${GITHUB_ENV}
-
+    - name: Set CONAN_PACKAGE_REFERENCE if user_channel available
+      if: ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
+      run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }}@${{ env.CONAN_PACKAGE_USER_CHANNEL }} >> ${GITHUB_ENV}
+    - name: Set CONAN_PACKAGE_REFERENCE if user_channel NOT available
+      if: ${{ !env.CONAN_PACKAGE_USER_CHANNEL }}
+      run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }} >> ${GITHUB_ENV}
 
     # use conan to build and store
     - name: Install Conan
