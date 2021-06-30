@@ -1,6 +1,16 @@
 name: Build 
 
-on: push
+on: 
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
 
 env:
   PACKAGE_NAME: hello
@@ -43,7 +53,8 @@ jobs:
 
     - name: Build
       run: conan create . ${{ github.actor }}/${{ steps.gitversion.outputs.escapedBranchName }}
-    - name: Upload
+    - name: Upload # ignore on pull_request 
+      if: ${{ github.event_name != 'pull_request' }}
       run: |
         conan remote add ${{ env.CONAN_REPO }} ${{ env.CONAN_REPO_URL }}
         conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r ${{ env.CONAN_REPO }} ${{ secrets.MY_JFROG_IO_USERNAME }}
