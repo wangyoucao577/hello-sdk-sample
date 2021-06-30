@@ -17,10 +17,8 @@ jobs:
     - name: Build
       run: conan create . demo/testing
     - name: Upload
-      uses: grisumbras/conan-upload@latest
-      with:
-        login: ${{ secrets.MY_JFROG_IO_USERNAME }}
-        password: ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }}
-        url: https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
-        reference: hello/0.1@demo/testing
+      run: |
+        conan remote add my-conan-repo https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
+        conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r my-conan-repo ${{ secrets.MY_JFROG_IO_USERNAME }}
+        conan upload hello/0.1@demo/testing -r my-conan-repo --all
       
