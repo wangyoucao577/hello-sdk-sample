@@ -40,8 +40,12 @@ jobs:
     - name: Display SemVer
       run: |
         echo "SemVer: $GITVERSION_SEMVER"
-    - name: Set PACKAGE_SEMVER env
+    - name: Set PACKAGE_SEMVER env for branchs/pr
+      if: ${{ github.event_name == 'push' && !contains(github.ref, 'tags') }} 
       run: echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }}+${{ steps.gitversion.outputs.escapedBranchName }}.${{ steps.gitversion.outputs.shortSha }} >> ${GITHUB_ENV}
+    - name: Set PACKAGE_SEMVER env for tags
+      if: ${{ github.event_name == 'push' && contains(github.ref, 'tags') }} 
+      run: echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }} >> ${GITHUB_ENV}
 
 
     # use conan to build and store
