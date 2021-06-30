@@ -4,8 +4,8 @@ import os
 class HelloConan(ConanFile):
     name = "hello"
     license = "MIT"
-    author = "<Put your name here> <And your email here>"
-    url = "<Package recipe repository url here, for issues about the package>"
+    author = "Jay Zhang <wangyoucao577@gmail.com>"
+    url = "https://github.com/wangyoucao577/hello-sdk-sample"
     description = "<Description of Hello here>"
     topics = ("<Put some tag here>", "<here>", "<and here>")
     settings = "os", "compiler", "build_type", "arch"
