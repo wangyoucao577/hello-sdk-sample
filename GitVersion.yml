@@ -4,7 +4,7 @@ branches:
   main:
     regex: ^master$|^main$
     mode: ContinuousDeployment
-    tag: ''
+    tag: 'alpha'
     increment: Minor
     prevent-increment-of-merged-branch-version: false
     track-merge-target: false
