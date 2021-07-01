@@ -3,6 +3,9 @@ Hello SDK sample code to try out [Conan, the C/C++ Package Manager](https://cona
 
 It uses [wangyoucao577.jfrog.io](https://wangyoucao577.jfrog.io/) as [Conan](https://conan.io/) storage which has been recommended in [Uploading to Artifactory Cloud Instance](https://docs.conan.io/en/latest/uploading_packages/artifactory/artifactory_cloud.html).     
 
+
+Refer to [wangyoucao577/hello-app-sample](https://github.com/wangyoucao577/hello-app-sample) for the executable app that invokes this Hello SDK.     
+
 ## Local Development
 
 ### Prerequisites
