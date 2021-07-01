@@ -89,7 +89,7 @@ jobs:
           conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
           conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -s build_type=Debug 
       - name: Build Shared
-        if: ${{ !contains(matrix.os, macos) }} # disable shared on macos at the moment due to poco doesn't have pre-built shared libraries. 
+        if: ${{ !contains(matrix.os, 'macos') }} # disable shared on macos at the moment due to poco doesn't have pre-built shared libraries. 
         run: |
           conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -o hello:shared=True 
           conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -s build_type=Debug -o hello:shared=True 
