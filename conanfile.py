@@ -23,6 +23,7 @@ class HelloConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
+        cmake.definitions["CMAKE_HELLO_SDK_VERSION"] = self.version
         cmake.configure(source_folder="src")
         cmake.build()
 

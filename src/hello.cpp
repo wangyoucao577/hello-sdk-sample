@@ -1,10 +1,16 @@
 #include <iostream>
 #include "hello.h"
 
+#ifndef HELLO_SDK_VERSION
+#define HELLO_SDK_VERSION "unknown"
+#endif
+
 void hello(){
+    std::cout << "hello sdk version: " << HELLO_SDK_VERSION << std::endl;
+
     #ifdef NDEBUG
-    std::cout << "hello/0.1: Hello World Release!" <<std::endl;
+    std::cout << "Hello World Release!" <<std::endl;
     #else
-    std::cout << "hello/0.1: Hello World Debug!" <<std::endl;
+    std::cout << "Hello World Debug!" <<std::endl;
     #endif
 }
