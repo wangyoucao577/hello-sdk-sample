@@ -16,6 +16,8 @@ env:
   PACKAGE_NAME: hello
   CONAN_REPO: my-conan-repo
   CONAN_REPO_URL: https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
+  CONAN_CHANNEL_FOR_RELEASE: stable
+  CONAN_CHANNEL_BY_DEFAULT: ci
 
 jobs:
 
@@ -48,12 +50,12 @@ jobs:
         if: ${{ ( github.event_name == 'push' && !contains(github.ref, 'tags')) || github.event_name == 'pull_request' }} 
         run: | 
           echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }}+${{ steps.gitversion.outputs.shortSha }} >> ${GITHUB_ENV}
-          echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/ci >> ${GITHUB_ENV}
+          echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/${{ env.CONAN_CHANNEL_BY_DEFAULT }} >> ${GITHUB_ENV}
       - name: Set envs for tags
         if: ${{ github.event_name == 'push' && contains(github.ref, 'tags') }} 
         run: | 
           echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }} >> ${GITHUB_ENV}
-          echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/release >> ${GITHUB_ENV}
+          echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/${{ env.CONAN_CHANNEL_FOR_RELEASE }} >> ${GITHUB_ENV}
       - name: Set CONAN_PACKAGE_REFERENCE if user_channel available
         if: ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
         run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }}@${{ env.CONAN_PACKAGE_USER_CHANNEL }} >> ${GITHUB_ENV}
