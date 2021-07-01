@@ -13,6 +13,7 @@ class HelloConan(ConanFile):
     default_options = {"shared": False, "fPIC": True}
     generators = "cmake"
     exports_sources = "src/*"
+    requires = "poco/1.9.4"
 
     def set_version(self):
         self.version = os.getenv('PACKAGE_SEMVER', '0.1')
