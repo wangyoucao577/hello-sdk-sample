@@ -19,57 +19,72 @@ env:
 
 jobs:
 
+  calc-version:
+    runs-on: ubuntu-latest
+    outputs:
+      packageSemVer: ${{ env.PACKAGE_SEMVER }}
+      conanUserChannel: ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
+      conanReference: ${{ env.CONAN_PACKAGE_REFERENCE }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      # use gitversion to determine next version
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0.9.9
+        with:
+          versionSpec: 'x.x.x'
+      - name: Determine Version
+        id:   gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.9
+        with:
+          useConfigFile: true
+      - name: Display SemVer
+        run: |
+          echo "SemVer: $GITVERSION_SEMVER"
+      - name: Set envs for branchs/pr
+        if: ${{ ( github.event_name == 'push' && !contains(github.ref, 'tags')) || github.event_name == 'pull_request' }} 
+        run: | 
+          echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }}+${{ steps.gitversion.outputs.shortSha }} >> ${GITHUB_ENV}
+          echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/ci >> ${GITHUB_ENV}
+      - name: Set envs for tags
+        if: ${{ github.event_name == 'push' && contains(github.ref, 'tags') }} 
+        run: | 
+          echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }} >> ${GITHUB_ENV}
+          echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/release >> ${GITHUB_ENV}
+      - name: Set CONAN_PACKAGE_REFERENCE if user_channel available
+        if: ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
+        run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }}@${{ env.CONAN_PACKAGE_USER_CHANNEL }} >> ${GITHUB_ENV}
+      - name: Set CONAN_PACKAGE_REFERENCE if user_channel NOT available
+        if: ${{ !env.CONAN_PACKAGE_USER_CHANNEL }}
+        run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }} >> ${GITHUB_ENV}
+
   build:
     runs-on: ubuntu-latest
+    needs: calc-version
+    env:
+      PACKAGE_SEMVER: ${{ needs.calc-version.outputs.packageSemVer }}
+      CONAN_PACKAGE_USER_CHANNEL: ${{ needs.calc-version.outputs.conanUserChannel }}
+      CONAN_PACKAGE_REFERENCE: ${{ needs.calc-version.outputs.conanReference }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    # use gitversion to determine next version
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.9
-      with:
-        versionSpec: 'x.x.x'
-    - name: Determine Version
-      id:   gitversion
-      uses: gittools/actions/gitversion/execute@v0.9.9
-      with:
-        useConfigFile: true
-    - name: Display SemVer
-      run: |
-        echo "SemVer: $GITVERSION_SEMVER"
-    - name: Set envs for branchs/pr
-      if: ${{ ( github.event_name == 'push' && !contains(github.ref, 'tags')) || github.event_name == 'pull_request' }} 
-      run: | 
-        echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }}+${{ steps.gitversion.outputs.shortSha }} >> ${GITHUB_ENV}
-        echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/ci >> ${GITHUB_ENV}
-    - name: Set envs for tags
-      if: ${{ github.event_name == 'push' && contains(github.ref, 'tags') }} 
-      run: | 
-        echo PACKAGE_SEMVER=${{ steps.gitversion.outputs.semVer }} >> ${GITHUB_ENV}
-        echo CONAN_PACKAGE_USER_CHANNEL=${{ github.actor }}/release >> ${GITHUB_ENV}
-    - name: Set CONAN_PACKAGE_REFERENCE if user_channel available
-      if: ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
-      run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }}@${{ env.CONAN_PACKAGE_USER_CHANNEL }} >> ${GITHUB_ENV}
-    - name: Set CONAN_PACKAGE_REFERENCE if user_channel NOT available
-      if: ${{ !env.CONAN_PACKAGE_USER_CHANNEL }}
-      run: echo CONAN_PACKAGE_REFERENCE=${{ env.PACKAGE_NAME }}/${{ env.PACKAGE_SEMVER }} >> ${GITHUB_ENV}
+      # use conan to build and store
+      - name: Install Conan
+        id: conan
+        uses: turtlebrowser/get-conan@main
+      - name: Conan version
+        run: echo "${{ steps.conan.outputs.version }}"
 
-    # use conan to build and store
-    - name: Install Conan
-      id: conan
-      uses: turtlebrowser/get-conan@main
-    - name: Conan version
-      run: echo "${{ steps.conan.outputs.version }}"
-
-    - name: Build
-      run: conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
-    - name: Upload # ignore on pull_request 
-      if: ${{ github.event_name != 'pull_request' }}
-      run: |
-        conan remote add ${{ env.CONAN_REPO }} ${{ env.CONAN_REPO_URL }}
-        conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r ${{ env.CONAN_REPO }} ${{ secrets.MY_JFROG_IO_USERNAME }}
-        conan upload ${{ env.CONAN_PACKAGE_REFERENCE }} -r ${{ env.CONAN_REPO }} --all
+      - name: Build
+        run: conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
+      - name: Upload # ignore on pull_request 
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          conan remote add ${{ env.CONAN_REPO }} ${{ env.CONAN_REPO_URL }}
+          conan user -p ${{ secrets.MY_JFROG_IO_ACCESS_TOKEN }} -r ${{ env.CONAN_REPO }} ${{ secrets.MY_JFROG_IO_USERNAME }}
+          conan upload ${{ env.CONAN_PACKAGE_REFERENCE }} -r ${{ env.CONAN_REPO }} --all
       
