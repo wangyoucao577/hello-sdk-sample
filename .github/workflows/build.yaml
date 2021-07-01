@@ -86,8 +86,8 @@ jobs:
         run: | 
           conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }}
           conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -s build_type=Debug 
-          conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -o shared=True 
-          conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -s build_type=Debug -o shared=True 
+          conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -o hello:shared=True 
+          conan create . ${{ env.CONAN_PACKAGE_USER_CHANNEL }} -s build_type=Debug -o hello:shared=True 
 
       - name: Upload # ignore on pull_request 
         if: ${{ github.event_name != 'pull_request' }}
