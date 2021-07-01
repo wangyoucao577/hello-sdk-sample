@@ -25,5 +25,9 @@ $ conan create .
 - Binaries(`include`/`lib`) will be published to [wangyoucao577.jfrog.io](https://wangyoucao577.jfrog.io/) after building.    
 - In addition, [Draft a new release](https://github.com/wangyoucao577/hello-sdk-sample/releases/new) will result to code build and stable binaries publishing too.    
 
-
+## View pre-built conan packages 
+```bash
+$ conan remote add my-conan-repo https://wangyoucao577.jfrog.io/artifactory/api/conan/test-conan-local
+$ conan search '*' -r my-conan-repo
+```
 
