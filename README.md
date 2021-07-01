@@ -20,9 +20,10 @@ $ conan create .
 ```
 
 ## Automation 
-Once your code is ready, run `git push` that will result to [automatically build and publish](https://github.com/wangyoucao577/hello-sdk-sample/actions) processes.     
-Binaries(`include`/`lib`) will be published to [wangyoucao577.jfrog.io](https://wangyoucao577.jfrog.io/) after building.    
-In addition, [Draft a new release](https://github.com/wangyoucao577/hello-sdk-sample/releases/new) will result to code build and stable binaries publishing too.    
- 
+- Once your code is ready, run `git push` that will result to [automatically build and publish](https://github.com/wangyoucao577/hello-sdk-sample/actions) processes.     
+- The generated binaries's version is calculated by [GitVersion](https://gitversion.net/) according [GitVersion.yml](GitVersion.yml) rules.     
+- Binaries(`include`/`lib`) will be published to [wangyoucao577.jfrog.io](https://wangyoucao577.jfrog.io/) after building.    
+- In addition, [Draft a new release](https://github.com/wangyoucao577/hello-sdk-sample/releases/new) will result to code build and stable binaries publishing too.    
+
 
 
